@@ -23,6 +23,7 @@ public class MainControl {
     @Autowired
     AccountTypeDao accountTypeDao;
 
+//    Test xml file
     @GetMapping(value = "/")
     public ResponseEntity<String> MessageControl() throws JAXBException {
         HttpHeaders headers = new HttpHeaders();
