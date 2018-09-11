@@ -23,7 +23,7 @@ public class MainControl {
     @Autowired
     AccountTypeDao accountTypeDao;
 
-//    Test xml file
+//    Test xml file we can read success xml invoice from SAT
     @GetMapping(value = "/")
     public ResponseEntity<String> MessageControl() throws JAXBException {
         HttpHeaders headers = new HttpHeaders();
