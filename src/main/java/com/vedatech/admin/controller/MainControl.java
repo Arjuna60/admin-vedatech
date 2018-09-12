@@ -24,33 +24,41 @@ public class MainControl {
     AccountTypeDao accountTypeDao;
 
 //    Test xml file we can read success xml invoice from SAT
-    @GetMapping(value = "/")
-    public ResponseEntity<String> MessageControl() throws JAXBException {
+    @GetMapping(value = "/api/test")
+    public ResponseEntity<String> MessageControl() {
         HttpHeaders headers = new HttpHeaders();
         headers.set("message", "Server is work success");
 
-        JAXBContext context = JAXBContext.newInstance(Comprobante.class);
-        File cfdi = new File("C:/SAT2/ANT021004RI7_PUHS6505319L9_764.xml");
 
-        Unmarshaller unmarshaller = context.createUnmarshaller();
+        JAXBContext context = null;
+        try {
+            context = JAXBContext.newInstance(Comprobante.class);
+            File cfdi = new File("C:/SAT2/ANT021004RI7_PUHS6505319L9_764.xml");
 
-        Comprobante unmarshal = (Comprobante) unmarshaller.unmarshal(cfdi);
-        System.out.println(unmarshal.getEmisor().getNombre());
-        System.out.println(unmarshal.getReceptor().getNombre());
-        System.out.println(unmarshal.getSubTotal());
-        System.out.println(unmarshal.getTotal());
-        System.out.println(unmarshal.getConceptos().getConcepto());
+            Unmarshaller unmarshaller = context.createUnmarshaller();
 
-        List<Comprobante.Conceptos.Concepto> conceptoList =  unmarshal.getConceptos().getConcepto();
+            Comprobante unmarshal = (Comprobante) unmarshaller.unmarshal(cfdi);
+            System.out.println(unmarshal.getEmisor().getNombre());
+            System.out.println(unmarshal.getReceptor().getNombre());
+            System.out.println(unmarshal.getSubTotal());
+            System.out.println(unmarshal.getTotal());
+            System.out.println(unmarshal.getConceptos().getConcepto());
 
-        for (Comprobante.Conceptos.Concepto co : conceptoList) {
+            List<Comprobante.Conceptos.Concepto> conceptoList =  unmarshal.getConceptos().getConcepto();
 
-            System.out.println(co.getDescripcion());
-            System.out.println(co.getCantidad());
-            System.out.println(co.getImporte());
+            for (Comprobante.Conceptos.Concepto co : conceptoList) {
+
+                System.out.println(co.getDescripcion());
+                System.out.println(co.getCantidad());
+                System.out.println(co.getImporte());
 
 
+            }
+        }catch (JAXBException e) {
+            e.printStackTrace();
         }
+
+
 
 
         return new ResponseEntity<String>(headers, HttpStatus.OK);
