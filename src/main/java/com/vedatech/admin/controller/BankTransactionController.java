@@ -2,22 +2,42 @@ package com.vedatech.admin.controller;
 
 
 import com.vedatech.admin.model.bank.BankTransaction;
+import com.vedatech.admin.model.invoice.Comprobante;
 import com.vedatech.admin.service.bank.BankTransactionService;
+import org.apache.tomcat.jni.FileInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.stream.XMLStreamReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import static org.springframework.http.MediaType.APPLICATION_XML;
+
 @RestController
 @RequestMapping("/api/bank")
 public class BankTransactionController {
+
+    private static String UPLOADED_FOLDER = "C://SAT2//";
 
     @Autowired
     BankTransactionService bankTransactionService;
@@ -128,6 +148,54 @@ public class BankTransactionController {
 
         }
     }
+
+
+    //-------------------Received Xml File--------------------------------------------------------
+
+
+    @RequestMapping(value = "/send-xml-file", consumes = MediaType.APPLICATION_XML_VALUE)
+    public ResponseEntity<String> getXmlInvoice(@RequestBody String comprobante) {
+        HttpHeaders headers = new HttpHeaders();
+        //Save the uploaded file to this folder
+        System.out.println("Comprobante " + comprobante.toString());
+        StringReader com = new StringReader(comprobante);
+        JAXBContext context = null;
+        try {
+            context = JAXBContext.newInstance(Comprobante.class);
+//            File cfdi = new File("C:/SAT2/ANT021004RI7_PUHS6505319L9_764.xml");
+
+//            System.out.println("CFDI " + cfdim);
+
+            Unmarshaller unmarshaller = context.createUnmarshaller();
+
+            Comprobante unmarshal = (Comprobante) unmarshaller.unmarshal(com);
+            System.out.println(unmarshal.getEmisor().getNombre());
+            System.out.println(unmarshal.getReceptor().getNombre());
+            System.out.println(unmarshal.getSubTotal());
+            System.out.println(unmarshal.getTotal());
+            System.out.println(unmarshal.getConceptos().getConcepto());
+
+            List<Comprobante.Conceptos.Concepto> conceptoList =  unmarshal.getConceptos().getConcepto();
+
+            for (Comprobante.Conceptos.Concepto co : conceptoList) {
+
+                System.out.println(co.getDescripcion());
+                System.out.println(co.getCantidad());
+                System.out.println(co.getImporte());
+
+
+            }
+        }catch (JAXBException e) {
+            e.printStackTrace();
+        }
+
+
+        headers.set("toodo ok ", "suxxess");
+
+
+       return new ResponseEntity<String>(headers, HttpStatus.OK);
+    }
+
 
 
 }
